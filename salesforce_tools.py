@@ -1,5 +1,4 @@
 import os
-import requests
 
 def conectar_salesforce():
     try:
@@ -14,16 +13,30 @@ def conectar_salesforce():
     except Exception as e:
         raise Exception(f"Erro ao conectar: {str(e)}")
 
-def buscar_nota_fiscal(numero_nf: str):
+def buscar_nota_fiscal(numero_nf: str, serie: str = ""):
     try:
         sf = conectar_salesforce()
+
+        # Filtro por número da NF e série
+        where = f"Name = '{numero_nf}'"
+        if serie:
+            where += f" AND Serie__c = '{serie}'"
+
         query = f"""
-            SELECT Id, Name, NF_Number__c, Phone__c, 
-                   Reference_Point__c, Status
-            FROM Order
-            WHERE NF_Number__c = '{numero_nf}'
+            SELECT 
+                Id,
+                Name,
+                Serie__c,
+                Referencia__c,
+                Telefone__c,
+                Status__c,
+                Data_do_Documento__c,
+                Conta__c
+            FROM Invoice__c
+            WHERE {where}
             LIMIT 1
         """
+
         resultado = sf.query(query)
         registros = resultado.get("records", [])
 
@@ -32,11 +45,12 @@ def buscar_nota_fiscal(numero_nf: str):
 
         dados = registros[0]
         return {
-            "numero_nf": numero_nf,
-            "telefone": dados.get("Phone__c", "Não informado"),
-            "ponto_referencia": dados.get("Reference_Point__c", "Não informado"),
-            "status": dados.get("Status", "Não informado"),
-            "nome": dados.get("Name", "Não informado"),
+            "numero_nf": dados.get("Name", numero_nf),
+            "serie": dados.get("Serie__c", "Não informado"),
+            "telefone": dados.get("Telefone__c", "Não informado"),
+            "ponto_referencia": dados.get("Referencia__c", "Não informado"),
+            "status": dados.get("Status__c", "Não informado"),
+            "data": dados.get("Data_do_Documento__c", "Não informado"),
         }, None
 
     except Exception as e:
