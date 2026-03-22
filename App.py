@@ -88,7 +88,6 @@ st.divider()
 st.caption("Sistema de consulta interno — Bemol S.A.")
 
 
-print("sidney")
-print("bemol")
+#git add . ; git commit -m "msg" ; git push#
 
 
