@@ -5,3 +5,11 @@ python-dotenv==1.0.0
 
 
 
+
+Get-Service ssh-agent | Set-Service -StartupType Automatic
+Start-Service ssh-agent
+
+RODAR NO TERMINAL- 
+
+ssh-add ~/.ssh/id_ed25519
+ssh -T git@github.com
